@@ -1,6 +1,12 @@
 import os
 import re
 from typing import Optional, List, Dict, Any
+from typing import Literal
+
+class FixRequest(BaseModel):
+    input: str
+    dry_run: bool = False
+    enp_target: Literal["NXP1", "NXP2"] = "NXP1"
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
@@ -157,8 +163,15 @@ def index():
 def fix_enp(req: Request, body: FixRequest):
     require_token(req)
     prev = expand_preview(body.input)
+
+    ENP_MAP = {
+        "NXP1": {"system_id": 500, "nprn": 98067},
+        "NXP2": {"system_id": 510, "nprn": 98019},
+    }
+    cfg = ENP_MAP[body.enp_target]
+
     if body.dry_run:
-        return {"dry_run": True, **prev}
+        return {"dry_run": True, "enp_target": body.enp_target, **prev, **cfg}
 
     dns = prev["expanded_dns"]
     with pg_conn() as conn, conn.cursor() as cur:
@@ -167,17 +180,18 @@ def fix_enp(req: Request, body: FixRequest):
             UPDATE numbers
             SET reservation_tstamp = '2050-01-01 00:00:00',
                 product_id = 1,
-                system_id = 500,
-                nprn = 98067,
+                system_id = %s,
+                nprn = %s,
                 outporting_tstamp = NULL,
                 lastupdated_tstamp = NOW()
             WHERE dn = ANY(%s)
             RETURNING dn;
             """,
-            (dns,),
+            (cfg["system_id"], cfg["nprn"], dns),
         )
         updated_dns = [r[0] for r in cur.fetchall()]
-    return {"dry_run": False, **prev, "updated_dns": updated_dns}
+
+    return {"dry_run": False, "enp_target": body.enp_target, **prev, **cfg, "updated_dns": updated_dns}
 
 
 @app.post("/fix/nprn")
