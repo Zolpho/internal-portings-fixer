@@ -71,7 +71,7 @@ Endpoints:
 
 ## Project layout
 
-# Recommended structure:
+### Recommended structure:
 ```
 internal-portings-fixer/
   app.py
@@ -80,7 +80,7 @@ internal-portings-fixer/
   static/
     index.html
 ```
-## Installation (Linux VM)
+### Installation (Linux VM)
 
 The app is designed to run on a Linux VM on the same LAN with network reachability to:
 
@@ -90,7 +90,7 @@ The app is designed to run on a Linux VM on the same LAN with network reachabili
 
 3) dispatcher-api2 MariaDB host
 
-# 1) System packages
+### 1) System packages
 
 Ubuntu/Debian example:
 ```
@@ -98,7 +98,7 @@ sudo apt update
 sudo apt install -y python3 python3-venv python3-pip
 ```
 
-# 2) Create directory
+### 2) Create directory
 
 ```
 sudo mkdir -p /opt/github/
@@ -106,19 +106,20 @@ sudo chown -R $USER:$USER /opt/github/
 cd /opt/github
 ```
 
-# 3) Clone repository
+### 3) Clone repository
 ```
+cd /opt/github/
 git clone https://github.com/Zolpho/internal-portings-fixer.git
 ```
 
-# 4) Create venv and install deps
+### 4) Create venv and install deps
 
 ```python3 -m venv venv
 ./venv/bin/pip install -U pip
 ./venv/bin/pip install -r requirements.txt
 ```
 
-# 5) Configure environment
+### 5) Configure environment
 
 ```
 python3 -m venv venv
@@ -148,7 +149,7 @@ MDB_PASS=YOUR_PASS
 MDB_DB=dispatcher-api2
 ```
 
-# 6) Run in foreground (test)
+### 6) Run in foreground (test)
 
 ```
 cd /opt/internal-portings-fixer
@@ -160,14 +161,14 @@ Open: `http://<VM_IP>:8000/`
 
 ## Run as a systemd service
 
-# 1) Create a service user
+### 1) Create a service user
 
 ```
 sudo useradd -r -s /usr/sbin/nologin portfix || true
 sudo chown -R portfix:portfix /opt/github/internal-portings-fixer
 ```
 
-# 2) Create systemd unit
+### 2) Create systemd unit
 
 Create `/etc/systemd/system/internal-portings-fixer.service`:
 ```
@@ -188,7 +189,7 @@ RestartSec=2
 WantedBy=multi-user.target
 ```
 
-# 3) Enable and start
+### 3) Enable and start
 
 ```
 sudo systemctl daemon-reload
@@ -196,13 +197,13 @@ sudo systemctl enable --now internal-portings-fixer
 sudo systemctl status internal-portings-fixer
 ```
 
-# Logs
+### Logs
 
 ```
 sudo journalctl -u internal-portings-fixer -f
 ```
 
-# Security notes
+## Security notes
 
 This app can update/delete production routing state across multiple systems.
 
@@ -214,7 +215,7 @@ Recommended hardening:
 
 - Consider putting it behind Nginx with IP allowlists and basic auth.
 
-# Operational notes / expected workflow
+## Operational notes / expected workflow
 
 Typical workflow for a number or range:
 
@@ -230,7 +231,7 @@ Run:
 
 Go to pSuite rich client and reprovision the number(s).
 
-# Troubleshooting
+## Troubleshooting
 
 401 Unauthorized: missing/incorrect `x-api-token`.
 
