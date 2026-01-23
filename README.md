@@ -6,6 +6,7 @@ Small FastAPI web app to correct “internal porting” inconsistencies across:
 - **pSuite / dispatcher-api2**: MariaDB table `cli_provisioning`
 
 The workflow and fixes are based on the internal “Internal portings” procedure (Scenario 1: wholesale 98019 → NXP1 98067)
+https://wiki.nexphone.ch/display/NETVOIP/Internal+portings
 
 ## What it fixes
 
