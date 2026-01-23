@@ -121,11 +121,6 @@ git clone https://github.com/Zolpho/internal-portings-fixer.git
 
 ### 5) Configure environment
 
-```
-python3 -m venv venv
-./venv/bin/pip install -U pip
-./venv/bin/pip install -r requirements.txt
-```
 Create `/opt/github/internal-portings-fixer/.env`:
 
 ```
@@ -152,7 +147,7 @@ MDB_DB=dispatcher-api2
 ### 6) Run in foreground (test)
 
 ```
-cd /opt/internal-portings-fixer
+cd /opt/github/internal-portings-fixer
 set -a; source .env; set +a
 ./venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
 ```
