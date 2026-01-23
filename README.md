@@ -114,7 +114,8 @@ git clone https://github.com/Zolpho/internal-portings-fixer.git
 
 ### 4) Create venv and install deps
 
-```python3 -m venv venv
+```
+python3 -m venv venv
 ./venv/bin/pip install -U pip
 ./venv/bin/pip install -r requirements.txt
 ```
