@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Internal porting fixes</title>
+  <style>
+    body { font-family: sans-serif; margin: 24px; }
+    input { width: 320px; padding: 6px; }
+    button { margin-right: 8px; padding: 6px 10px; }
+    pre { background: #111; color: #eee; padding: 12px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h3>Internal porting fixes</h3>
+
+  <div>
+    <input id="inp" placeholder="0449510080 or 0449510080-89 (max 100)" />
+    <label style="margin-left:12px;">
+      <input type="checkbox" id="dry" /> dry-run
+    </label>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button onclick="callFix('/fix/enp')">fix ENP</button>
+    <button onclick="callFix('/fix/nprn')">fix nprn-routing</button>
+    <button onclick="callFix('/fix/disp')">fix disp routing</button>
+  </div>
+
+  <div style="margin-top:12px;">
+    <label>API token:</label>
+    <input id="token" placeholder="x-api-token" style="width:420px;" />
+  </div>
+
+  <pre id="out" style="margin-top:12px;"></pre>
+
+  <script>
+    async function callFix(path) {
+      const input = document.getElementById('inp').value;
+      const dry_run = document.getElementById('dry').checked;
+      const token = document.getElementById('token').value;
+
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-token': token
+        },
+        body: JSON.stringify({ input, dry_run })
+      });
+
+      let text = await res.text();
+      try { text = JSON.stringify(JSON.parse(text), null, 2); } catch (e) {}
+      document.getElementById('out').textContent = text;
+    }
+  </script>
+</body>
+</html>
+
