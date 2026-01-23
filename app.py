@@ -2,6 +2,7 @@ import os
 import re
 from typing import Optional, List, Dict, Any
 from typing import Literal
+from pydantic import BaseModel
 
 class FixRequest(BaseModel):
     input: str
@@ -12,7 +13,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 
 import psycopg
 import redis
