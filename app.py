@@ -2,17 +2,12 @@ import os
 import re
 from typing import Optional, List, Dict, Any
 from typing import Literal
-from pydantic import BaseModel
-
-class FixRequest(BaseModel):
-    input: str
-    dry_run: bool = False
-    enp_target: Literal["NXP1", "NXP2"] = "NXP1"
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 import psycopg
 import redis
@@ -41,15 +36,16 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
+class FixRequest(BaseModel):
+    input: str
+    dry_run: bool = False
+    enp_target: Literal["NXP1", "NXP2"] = "NXP1"
+
+
 def require_token(req: Request):
     token = req.headers.get("x-api-token") or ""
     if token != API_TOKEN:
         raise HTTPException(401, "Unauthorized")
-
-
-class FixRequest(BaseModel):
-    input: str                  # "0449510080" or "0449510080-89"
-    dry_run: bool = False
 
 
 def normalize_to_digits(s: str) -> str:
@@ -57,20 +53,12 @@ def normalize_to_digits(s: str) -> str:
 
 
 def to_dn_and_target(number: str) -> tuple[str, str]:
-    """
-    Accepts either:
-      - target_number form: 0449510080  (CH national)
-      - dn form:          41449510080   (E.164 digits without '+')
-    Returns (dn, target_number).
-    """
     raw = normalize_to_digits(number)
 
-    # 10-digit CH national with leading 0: 0XXXXXXXXX
     if len(raw) == 10 and raw.startswith("0"):
         dn = "41" + raw[1:]
         return dn, raw
 
-    # CH E.164 digits: 41XXXXXXXXX
     if len(raw) == 11 and raw.startswith("41"):
         target = "0" + raw[2:]
         return raw, target
@@ -91,7 +79,6 @@ def expand_numbers(expr: str, max_span: int = 100) -> List[str]:
     if not start_digits or not end_digits:
         raise HTTPException(400, "Bad range format")
 
-    # end can be suffix, e.g. 0449510080-89
     if len(end_digits) < len(start_digits):
         end_full = start_digits[: len(start_digits) - len(end_digits)] + end_digits
     else:
